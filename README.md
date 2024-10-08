@@ -32,7 +32,17 @@ Or install it yourself as:
 
 ### Generating an access token
 
-To use the `pcloud_api` client, you will need to first generate an access token. You may do this by cloning and running the script in [`./bin/generate_access_token`](https://github.com/jhunschejones/pcloud_api/blob/master/bin/generate_access_token). It will take you through the process of setting up a pCloud app and completing the OAuth2 flow in the browser.
+To use the `pcloud_api` client, you will need to first generate an access token. You may do this by opening a Rails console or IRB session and entering the following code:
+
+```ruby
+irb(main):001:0> require "pcloud_api"
+=> true
+irb(main):002:0> Pcloud::Client.generate_access_token
+=== Follow these steps to generate a pCloud app and access token ===
+...
+```
+
+You will be presented with an interactive prompt which will take you through the process of setting up a pCloud app and completing the OAuth2 flow in the browser. At the end of the prompt, your new access token will be displayed. You should save this value in a secure location as it can be used to access your pCloud account data.
 
 ### Configuration
 

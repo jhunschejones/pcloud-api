@@ -33,6 +33,41 @@ module Pcloud
         json_response
       end
 
+      def generate_access_token
+        puts "=== Follow these steps to generate a pCloud app and access token ==="
+        puts "1. Register an app at `https://docs.pcloud.com/my_apps/`"
+
+        puts "2. Enter the client id and secret for the app:"
+        print "Client ID > "
+        client_id = $stdin.gets.chomp
+
+        print "Client Secret > "
+        client_secret = $stdin.gets.chomp
+
+        puts "3. Enter the data region of your pCloud account [EU/US]:"
+        print "> "
+        region_specific_api_base = $stdin.gets.chomp == "EU" ? "eapi.pcloud.com" : "api.pcloud.com"
+
+        puts "4. Navigate to this URL to start the access code flow:"
+        puts "`https://my.pcloud.com/oauth2/authorize?client_id=#{client_id}&response_type=code`"
+        puts "5. After logging in, enter the access code provided below:"
+        print "> "
+        access_code = $stdin.gets.chomp
+
+        puts "6. Requesting access token from pCloud..."
+        query = { client_id: client_id, client_secret: client_secret, code: access_code }
+        response = HTTParty.post(
+          "https://#{region_specific_api_base}/oauth2_token?#{URI.encode_www_form(query)}",
+          headers: { "Accept" => "application/json" }
+        )
+
+        json_response = JSON.parse(response.body)
+        raise json_response["error"] if json_response["error"]
+        puts "Done! Your access token is: \n#{json_response["access_token"]}"
+        puts "\nStore this value somewhere secure as it can be used to access your"
+        puts "pCloud account data and it will not be shown again."
+      end
+
       private
 
       def data_region_from_config_or_env

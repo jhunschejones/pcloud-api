@@ -73,6 +73,40 @@ RSpec.describe Pcloud::Client do
     end
   end
 
+  describe ".generate_access_token" do
+    let(:httparty_response) { double(HTTParty::Response) }
+
+    before do
+      # silence console output from the interactive CLI
+      allow(Pcloud::Client).to receive(:puts)
+      allow(Pcloud::Client).to receive(:print)
+
+      allow(httparty_response).to receive(:body).and_return({ access_token: "Here's your access token!" }.to_json)
+      allow(HTTParty).to receive(:post).and_return(httparty_response)
+    end
+
+    it "makes the expected web request to get an access token" do
+      client_id = "my_client_id"
+      client_secret = "my_client_secret"
+      access_code = "pcloud_access_code"
+
+      allow($stdin).to receive(:gets).and_return(
+        client_id,
+        client_secret,
+        "EU", # user specified data region
+        access_code, # access code provided by pCloud
+      )
+      expect(HTTParty)
+        .to receive(:post)
+        .with(
+          "https://eapi.pcloud.com/oauth2_token?client_id=#{client_id}&client_secret=#{client_secret}&code=#{access_code}",
+          { headers: { "Accept" => "application/json" } }
+        ).and_return(httparty_response)
+
+      Pcloud::Client.generate_access_token
+    end
+  end
+
   describe ".data_region_from_config_or_env" do
     it "reads from module configuration" do
       Pcloud::Client.configure(access_token: "test-token", data_region: "EU")

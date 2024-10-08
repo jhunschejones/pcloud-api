@@ -2,6 +2,8 @@ require "httparty"
 require "tzinfo"
 require "json"
 require "time"
+require "json"
+require "uri"
 
 require "pcloud/version"
 require "pcloud/time_helper"
